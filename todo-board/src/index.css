@@ -1,7 +1,131 @@
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
 @import "tailwindcss";
 
+html {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 body {
-  margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #090d13;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.font-hand {
+  font-family: "Patrick Hand", cursive;
+}
+
+.post-it-paper {
+  background-image:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(255, 255, 255, 0.25) 0 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 80% 60%,
+      rgba(0, 0, 0, 0.04) 0 1px,
+      transparent 1px
+    );
+
+  background-size:
+    18px 18px,
+    24px 24px;
+}
+
+/* Paper treatment scoped to task cards; the tape keeps its own styling. */
+.post-it-note {
+  background-image:
+    linear-gradient(115deg, rgb(255 255 255 / 14%), transparent 40%, rgb(0 0 0 / 3%)),
+    linear-gradient(0deg, rgb(0 0 0 / 5%), transparent 10%, transparent 90%, rgb(255 255 255 / 12%));
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 20%),
+    2px 8px 8px rgb(0 0 0 / 18%),
+    0 16px 26px rgb(0 0 0 / 24%);
+}
+
+.post-it-note::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("./assets/paper-texture.svg");
+  background-size: 220px 220px;
+  mix-blend-mode: multiply;
+  opacity: 0.2;
+  pointer-events: none;
+  content: "";
+}
+
+.note-title::after {
+  display: block;
+  width: 92%;
+  height: 3px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+  transform: rotate(-2deg);
+  content: "";
+}
+
+.note-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgb(32 29 25 / 16%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 8%);
+  color: #201d19;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  transition: background-color 150ms, border-color 150ms, color 150ms;
+}
+
+.note-action svg {
+  flex-shrink: 0;
+}
+
+@media (hover: hover) {
+  .note-action:hover {
+    border-color: rgb(32 29 25 / 30%);
+    background: rgb(255 255 255 / 24%);
+  }
+
+  .note-action.note-action--complete:hover {
+    border-color: #166534;
+    background: #15803d;
+    color: #fff;
+  }
+
+  .note-action.note-action--delete:hover {
+    border-color: #991b1b;
+    background: #b91c1c;
+    color: #fff;
+  }
+}
+
+.note-action:active {
+  background: rgb(32 29 25 / 8%);
+}
+
+.note-action:focus-visible {
+  outline: 2px solid #201d19;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-action {
+    transition: none;
+  }
 }
