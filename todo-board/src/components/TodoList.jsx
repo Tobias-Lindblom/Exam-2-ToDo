@@ -1,7 +1,7 @@
 import { StickyNote } from "lucide-react";
 import TodoItem from "./TodoItem";
 
-function TodoList({ todos, onToggleTodo, onDeleteTodo }) {
+function TodoList({ todos, onToggleTodo, onDeleteTodo, onAddSubtask, onToggleSubtask, onDeleteSubtask }) {
 
   return (
     <section aria-label="Dina uppgifter">
@@ -29,6 +29,9 @@ function TodoList({ todos, onToggleTodo, onDeleteTodo }) {
               todo={todo}
               onToggleTodo={onToggleTodo}
               onDeleteTodo={onDeleteTodo}
+              onAddSubtask={onAddSubtask}
+              onToggleSubtask={onToggleSubtask}
+              onDeleteSubtask={onDeleteSubtask}
             />
           ))}
         </div>

@@ -129,3 +129,35 @@ button:not(:disabled) {
     transition: none;
   }
 }
+
+
+.note-checkbox {
+  display: block;
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  border: 2px solid rgb(32 29 25 / 70%);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.note-checkbox:checked {
+  border-color: #382334;
+  background: #382334;
+}
+
+.note-checkbox:focus-visible {
+  outline: 2px solid #201d19;
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  .note-checkbox {
+    appearance: auto;
+  }
+
+  .note-checkbox + svg {
+    display: none;
+  }
+}

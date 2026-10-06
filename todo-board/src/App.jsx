@@ -16,6 +16,7 @@ function App() {
       text: text.trim(),
       completed: false,
       appearance: nextAppearance.current++,
+      subtasks: [],
     };
 
     setTodos((current) => [...current, newTodo]);
@@ -23,14 +24,65 @@ function App() {
 
   function toggleTodo(id) {
     setTodos((current) =>
-      current.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-      ),
+      current.map((todo) => {
+        if (todo.id !== id) return todo;
+
+        const completed = !todo.completed;
+        return {
+          ...todo,
+          completed,
+          subtasks: todo.subtasks.map((subtask) => ({ ...subtask, completed })),
+        };
+      }),
     );
   }
 
   function deleteTodo(id) {
     setTodos((current) => current.filter((todo) => todo.id !== id));
+  }
+
+  function updateSubtasks(todoId, update) {
+    setTodos((current) =>
+      current.map((todo) => {
+        if (todo.id !== todoId) return todo;
+
+        const subtasks = update(todo.subtasks);
+        return {
+          ...todo,
+          subtasks,
+          completed: subtasks.length > 0
+            ? subtasks.every((subtask) => subtask.completed)
+            : todo.completed,
+        };
+      }),
+    );
+  }
+
+  function addSubtask(todoId, text) {
+    if (!text.trim()) return;
+
+    const subtask = {
+      id: crypto.randomUUID(),
+      text: text.trim(),
+      completed: false,
+    };
+    updateSubtasks(todoId, (subtasks) => [...subtasks, subtask]);
+  }
+
+  function toggleSubtask(todoId, subtaskId) {
+    updateSubtasks(todoId, (subtasks) =>
+      subtasks.map((subtask) =>
+        subtask.id === subtaskId
+          ? { ...subtask, completed: !subtask.completed }
+          : subtask,
+      ),
+    );
+  }
+
+  function deleteSubtask(todoId, subtaskId) {
+    updateSubtasks(todoId, (subtasks) =>
+      subtasks.filter((subtask) => subtask.id !== subtaskId),
+    );
   }
 
   return (
@@ -42,6 +94,9 @@ function App() {
           todos={todos}
           onToggleTodo={toggleTodo}
           onDeleteTodo={deleteTodo}
+          onAddSubtask={addSubtask}
+          onToggleSubtask={toggleSubtask}
+          onDeleteSubtask={deleteSubtask}
         />
       </div>
     </main>

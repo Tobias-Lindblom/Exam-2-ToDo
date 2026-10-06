@@ -1,6 +1,8 @@
-import { createElement } from "react";
-import { Check, RotateCcw, Trash2 } from "lucide-react";
+import { createElement, useRef, useState } from "react";
+import { Check, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { getTodoIcon } from "../utils/getTodoIcon";
+import TodoChecklist from "./TodoChecklist";
+import TodoSubtaskForm from "./TodoSubtaskForm";
 
 const noteStyles = [
   { color: "bg-[#FFE66D]", rotation: "md:rotate-[-1deg]" },
@@ -11,13 +13,22 @@ const noteStyles = [
   { color: "bg-[#FFDF61]", rotation: "md:rotate-[1deg]" },
 ];
 
-function TodoItem({ todo, onToggleTodo, onDeleteTodo }) {
+function TodoItem({ todo, onToggleTodo, onDeleteTodo, onAddSubtask, onToggleSubtask, onDeleteSubtask }) {
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
+  const addSubtaskButtonRef = useRef(null);
+
+  function closeSubtaskForm() {
+    setIsAddingSubtask(false);
+    addSubtaskButtonRef.current?.focus();
+  }
+
+
   const icon = createElement(getTodoIcon(todo.text), {
     "aria-hidden": true,
     strokeWidth: 2.5,
     absoluteStrokeWidth: true,
     size: 96,
-    className: "h-20 w-20 sm:h-24 sm:w-24",
+    className: "h-16 w-16 sm:h-20 sm:w-20",
   });
   const appearance = todo.appearance ?? 0;
   const { color, rotation } = noteStyles[appearance % noteStyles.length];
@@ -49,11 +60,13 @@ function TodoItem({ todo, onToggleTodo, onDeleteTodo }) {
         )}
       </div>
 
-      <div
-        aria-hidden="true"
-        className="flex min-h-28 flex-1 items-center justify-end py-3 pr-1"
-      >
-        <div className="relative -rotate-6">
+      <div className="flex min-h-28 flex-1 flex-wrap items-start gap-3 py-4">
+        <TodoChecklist
+          todo={todo}
+          onToggleSubtask={onToggleSubtask}
+          onDeleteSubtask={onDeleteSubtask}
+        />
+        <div aria-hidden="true" className="relative mt-4 ml-auto shrink-0 -rotate-6">
           <svg
             viewBox="0 0 32 24"
             fill="none"
@@ -68,33 +81,52 @@ function TodoItem({ todo, onToggleTodo, onDeleteTodo }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5 pt-3">
-        <button
-          type="button"
-          onClick={() => onToggleTodo(todo.id)}
-          aria-label={
-            todo.completed
-              ? `Markera som aktiv: ${todo.text}`
-              : `Markera som klar: ${todo.text}`
-          }
-          className={todo.completed ? "note-action" : "note-action note-action--complete"}
-        >
-          {todo.completed ? (
-            <RotateCcw aria-hidden="true" size={18} />
-          ) : (
-            <Check aria-hidden="true" size={18} strokeWidth={2.5} />
-          )}
-          <span>{todo.completed ? "Ångra" : "Klar"}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onDeleteTodo(todo.id)}
-          aria-label={`Radera uppgift: ${todo.text}`}
-          className="note-action note-action--delete"
-        >
-          <Trash2 aria-hidden="true" size={18} />
-          <span>Radera</span>
-        </button>
+      <div className="pt-3">
+        {isAddingSubtask && (
+          <TodoSubtaskForm
+            todo={todo}
+            onAddSubtask={onAddSubtask}
+            onCancel={closeSubtaskForm}
+          />
+        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onToggleTodo(todo.id)}
+            aria-label={
+              todo.completed
+                ? `Markera som aktiv: ${todo.text}`
+                : `Markera som klar: ${todo.text}`
+            }
+            className={todo.completed ? "note-action" : "note-action note-action--complete"}
+          >
+            {todo.completed ? (
+              <RotateCcw aria-hidden="true" size={18} />
+            ) : (
+              <Check aria-hidden="true" size={18} strokeWidth={2.5} />
+            )}
+            <span>{todo.completed ? "Ångra" : "Klar"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onDeleteTodo(todo.id)}
+            aria-label={`Radera uppgift: ${todo.text}`}
+            className="note-action note-action--delete"
+          >
+            <Trash2 aria-hidden="true" size={18} />
+            <span>Radera</span>
+          </button>
+          <button
+            ref={addSubtaskButtonRef}
+            type="button"
+            aria-expanded={isAddingSubtask}
+            onClick={() => isAddingSubtask ? closeSubtaskForm() : setIsAddingSubtask(true)}
+            className="note-action"
+          >
+            <Plus aria-hidden="true" size={16} />
+            <span>Deluppgift</span>
+          </button>
+        </div>
       </div>
     </article>
   );
