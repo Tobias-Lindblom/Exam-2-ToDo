@@ -18,6 +18,19 @@ function App() {
 
     setTodos([...todos, newTodo]);
   }
+
+  function toggleTodo(id) {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  }
+
+  function deleteTodo(id) {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  }
+
   return (
     <main className="min-h-screen bg-[#0d1117] text-white">
       <div className="mx-auto max-w-6xl px-6 py-10">
@@ -25,7 +38,11 @@ function App() {
 
         <TodoForm onAddTodo={addTodo} />
 
-        <TodoList todos={todos} />
+        <TodoList
+          todos={todos}
+          onToggleTodo={toggleTodo}
+          onDeleteTodo={deleteTodo}
+        />
       </div>
     </main>
   );
