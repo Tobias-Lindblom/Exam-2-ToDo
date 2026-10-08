@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
+import IconButton from "../ui/IconButton";
 
-function TodoSubtaskForm({ todo, onAddSubtask, onCancel }) {
+function TodoSubtaskCreateForm({ todoId, todoTitle, onAddSubtask, onCancel }) {
   const [text, setText] = useState("");
   const inputId = useId();
   const inputRef = useRef(null);
@@ -14,8 +15,7 @@ function TodoSubtaskForm({ todo, onAddSubtask, onCancel }) {
     event.preventDefault();
     if (!text.trim()) return;
 
-    onAddSubtask(todo.id, text);
-    // Behåll formuläret öppet och fokus i fältet så att flera deluppgifter kan läggas till i följd.
+    onAddSubtask(todoId, text);
     setText("");
     inputRef.current?.focus();
   }
@@ -29,10 +29,12 @@ function TodoSubtaskForm({ todo, onAddSubtask, onCancel }) {
           onCancel();
         }
       }}
-      aria-label={`Lägg till deluppgift i ${todo.text}`}
+      aria-label={`Lägg till deluppgift i ${todoTitle}`}
       className="mb-3 flex items-center gap-2"
     >
-      <label htmlFor={inputId} className="sr-only">Ny deluppgift</label>
+      <label htmlFor={inputId} className="sr-only">
+        Ny deluppgift
+      </label>
       <input
         ref={inputRef}
         id={inputId}
@@ -42,26 +44,20 @@ function TodoSubtaskForm({ todo, onAddSubtask, onCancel }) {
         autoComplete="off"
         className="min-h-11 min-w-0 flex-1 rounded-lg border border-black/25 bg-white/30 px-3 py-2 text-base text-note-ink outline-none placeholder:text-black/50 focus:border-black/60 focus:ring-2 focus:ring-black/15"
       />
-      <button
+      <IconButton
+        variant="filled"
         type="submit"
         disabled={!text.trim()}
-        aria-label="Lägg till deluppgift"
+        label="Lägg till deluppgift"
         title="Lägg till"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black/10 transition-colors enabled:hover:bg-black/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-note-ink disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Check aria-hidden="true" size={18} />
-      </button>
-      <button
-        type="button"
-        onClick={onCancel}
-        aria-label="Avbryt deluppgift"
-        title="Avbryt"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-black/65 hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-note-ink"
-      >
+      </IconButton>
+      <IconButton onClick={onCancel} label="Avbryt deluppgift" title="Avbryt">
         <X aria-hidden="true" size={18} />
-      </button>
+      </IconButton>
     </form>
   );
 }
 
-export default TodoSubtaskForm;
+export default TodoSubtaskCreateForm;

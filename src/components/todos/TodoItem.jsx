@@ -1,10 +1,10 @@
-import { createElement, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Check } from "lucide-react";
-import { getTodoIcon } from "../utils/getTodoIcon";
+import TodoIllustration from "./TodoIllustration";
 import TodoActions from "./TodoActions";
 import TodoChecklist from "./TodoChecklist";
 import TodoCompleteDialog from "./TodoCompleteDialog";
-import TodoSubtaskForm from "./TodoSubtaskForm";
+import TodoSubtaskCreateForm from "./TodoSubtaskCreateForm";
 
 const noteStyles = [
   { color: "bg-[#FFE66D]", rotation: "rotate-[-1deg]" },
@@ -27,18 +27,16 @@ function TodoItem({
   const [isAddingSubtask, setIsAddingSubtask] = useState(false);
   const [isConfirmingCompletion, setIsConfirmingCompletion] = useState(false);
   const addSubtaskButtonRef = useRef(null);
+  const remainingCount = todo.subtasks.filter(
+    (subtask) => !subtask.completed,
+  ).length;
 
-  // Stäng deluppgiftsfältet när lappen blir klar, så att det inte öppnas igen vid Ångra.
   if (todo.completed && isAddingSubtask) {
     setIsAddingSubtask(false);
   }
 
-  // Be om bekräftelse innan Klar bockar av återstående deluppgifter åt användaren.
   function handleToggleTodo() {
-    if (
-      !todo.completed &&
-      todo.subtasks.some((subtask) => !subtask.completed)
-    ) {
+    if (!todo.completed && remainingCount > 0) {
       setIsConfirmingCompletion(true);
       return;
     }
@@ -47,17 +45,9 @@ function TodoItem({
 
   function closeSubtaskForm() {
     setIsAddingSubtask(false);
-    // Formuläret försvinner; flytta fokus tillbaka till knappen som öppnade det.
     addSubtaskButtonRef.current?.focus();
   }
 
-  const icon = createElement(getTodoIcon(todo.text), {
-    "aria-hidden": true,
-    strokeWidth: 2.5,
-    absoluteStrokeWidth: true,
-    size: 96,
-    className: "h-16 w-16 sm:h-20 sm:w-20",
-  });
   const appearance = todo.appearance;
   const { color, rotation } = noteStyles[appearance % noteStyles.length];
 
@@ -71,62 +61,57 @@ function TodoItem({
         className="absolute -top-3 left-1/2 h-7 w-20 -translate-x-1/2 -rotate-2 border-x border-white/20 bg-white/45 shadow-sm"
       />
 
+      {todo.completed && (
+        <span
+          role="img"
+          aria-label="Klar"
+          className="pointer-events-none absolute inset-0 -z-1 flex items-center justify-center"
+        >
+          <Check
+            aria-hidden="true"
+            strokeWidth={2.5}
+            className="h-auto max-h-[70%] w-3/5 -rotate-8 text-note-done opacity-80"
+          />
+        </span>
+      )}
       <div className="flex items-start gap-3">
         <h3
-          className={`note-title font-hand min-w-0 flex-1 text-[2rem] font-semibold leading-[1.15] wrap-anywhere sm:text-[2.375rem] ${todo.completed ? "note-completed-text" : ""}`}
+          className={`note-title font-hand min-w-0 flex-1 text-[2rem] font-semibold leading-[1.15] wrap-anywhere sm:text-[2.375rem] ${todo.completed ? "line-through decoration-note-ink decoration-[3px] [text-decoration-skip-ink:none]" : ""}`}
         >
           {todo.text}
         </h3>
         <span
-          role="img"
-          aria-label="Klar"
-          aria-hidden={!todo.completed}
-          className={`-mt-2 flex h-9 w-9 shrink-0 items-center justify-center text-note-done sm:h-10 sm:w-10 ${todo.completed ? "" : "invisible"}`}
-        >
-          <Check
-            aria-hidden="true"
-            size={48}
-            strokeWidth={3.5}
-            className="h-11 w-11 shrink-0 rotate-[-8deg] sm:h-12 sm:w-12"
-          />
-        </span>
+          aria-hidden="true"
+          className="-mt-2 h-9 w-9 shrink-0 sm:h-10 sm:w-10"
+        />
       </div>
 
       <div className="flex min-h-28 flex-1 flex-wrap items-start gap-3 py-4">
         <TodoChecklist
-          todo={todo}
+          todoId={todo.id}
+          todoTitle={todo.text}
+          subtasks={todo.subtasks}
+          todoCompleted={todo.completed}
           onToggleSubtask={onToggleSubtask}
           onEditSubtask={onEditSubtask}
           onDeleteSubtask={onDeleteSubtask}
         />
-        <div
-          aria-hidden="true"
-          className="relative mt-4 ml-auto shrink-0 -rotate-6"
-        >
-          <svg
-            viewBox="0 0 32 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            className="absolute -right-1 -top-4 h-6 w-8"
-          >
-            <path d="M8 13 12 3M19 18l8-7" />
-          </svg>
-          {icon}
-        </div>
+        <TodoIllustration text={todo.text} completed={todo.completed} />
       </div>
 
       <div className="pt-3">
         {isAddingSubtask && (
-          <TodoSubtaskForm
-            todo={todo}
+          <TodoSubtaskCreateForm
+            todoId={todo.id}
+            todoTitle={todo.text}
             onAddSubtask={onAddSubtask}
             onCancel={closeSubtaskForm}
           />
         )}
         <TodoActions
-          todo={todo}
+          todoId={todo.id}
+          todoTitle={todo.text}
+          completed={todo.completed}
           isAddingSubtask={isAddingSubtask}
           addSubtaskButtonRef={addSubtaskButtonRef}
           onToggleTodo={handleToggleTodo}
@@ -138,7 +123,7 @@ function TodoItem({
       </div>
       {isConfirmingCompletion && (
         <TodoCompleteDialog
-          todo={todo}
+          remainingCount={remainingCount}
           onCancel={() => setIsConfirmingCompletion(false)}
           onConfirm={() => {
             setIsConfirmingCompletion(false);

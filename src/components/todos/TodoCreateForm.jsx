@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
-function TodoForm({ onAddTodo }) {
+function TodoCreateForm({ onAddTodo }) {
   const [text, setText] = useState("");
 
   function handleSubmit(event) {
@@ -25,7 +25,7 @@ function TodoForm({ onAddTodo }) {
         type="text"
         value={text}
         onChange={(event) => setText(event.target.value)}
-        placeholder="Vad vill du få gjort?"
+        placeholder="Vad ska stå på lappen?"
         autoComplete="off"
         className="font-hand min-w-0 flex-1 rounded-xl border border-slate-600 bg-[#202b3b] px-4 py-3.5 text-[1.375rem] leading-6 text-white outline-none transition-colors placeholder:text-slate-400 focus:border-accent focus:ring-2 focus:ring-accent/20"
       />
@@ -41,4 +41,4 @@ function TodoForm({ onAddTodo }) {
   );
 }
 
-export default TodoForm;
+export default TodoCreateForm;

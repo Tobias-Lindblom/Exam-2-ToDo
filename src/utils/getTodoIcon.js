@@ -29,7 +29,6 @@ export function getTodoIcon(text) {
   const words = text.normalize("NFC").toLowerCase().match(/\p{L}+/gu) ?? [];
   const normalizedText = ` ${words.join(" ")} `;
 
-  // Matcha hela ord och fraser så att exempelvis "mobilen" inte ger träff på "bil".
   const rule = iconRules.find(({ keywords }) =>
     keywords.some((keyword) => normalizedText.includes(` ${keyword} `)),
   );

@@ -2,28 +2,29 @@ import { useRef, useState } from "react";
 
 function useTodos() {
   const [todos, setTodos] = useState([]);
-  // En separat räknare ger nya lappar nästa stil även när andra lappar har raderats.
+  // Räknaren ger nya lappar nästa stil även när tidigare lappar har raderats.
   const nextAppearance = useRef(0);
 
   function addTodo(text) {
-    if (!text.trim()) return;
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
 
     const newTodo = {
       id: crypto.randomUUID(),
-      text: text.trim(),
+      text: trimmedText,
       completed: false,
       appearance: nextAppearance.current++,
       subtasks: [],
     };
 
-    setTodos((current) => [...current, newTodo]);
+    setTodos((currentTodos) => [...currentTodos, newTodo]);
   }
 
-  // Klar och Ångra gäller både lappen och samtliga deluppgifter.
-  function toggleTodo(id) {
-    setTodos((current) =>
-      current.map((todo) => {
-        if (todo.id !== id) return todo;
+  // Klar och Ångra ändrar både lappens status och alla dess deluppgifter.
+  function toggleTodo(todoId) {
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) => {
+        if (todo.id !== todoId) return todo;
 
         const completed = !todo.completed;
         return {
@@ -35,40 +36,45 @@ function useTodos() {
     );
   }
 
-  function deleteTodo(id) {
-    setTodos((current) => current.filter((todo) => todo.id !== id));
+  function deleteTodo(todoId) {
+    setTodos((currentTodos) => currentTodos.filter((todo) => todo.id !== todoId));
   }
 
-  // Räkna om lappens status efter en ändring i checklistan.
-  // Om sista deluppgiften raderas behålls lappens tidigare status.
-  function updateSubtasks(todoId, update) {
-    setTodos((current) =>
-      current.map((todo) => {
+  // updateSubtaskList tar emot deluppgifterna och returnerar en uppdaterad lista.
+  function updateSubtasks(todoId, updateSubtaskList, { allowCompleted = false } = {}) {
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) => {
         if (todo.id !== todoId) return todo;
 
-        const subtasks = update(todo.subtasks);
+        // Redigering och radering kräver att lappen är aktiv.
+        if (todo.completed && !allowCompleted) return todo;
+
+        const updatedSubtasks = updateSubtaskList(todo.subtasks);
+        // Om sista deluppgiften raderas behåller lappen sin tidigare status.
+        const completed = updatedSubtasks.length > 0
+          ? updatedSubtasks.every((subtask) => subtask.completed)
+          : todo.completed;
         return {
           ...todo,
-          subtasks,
-          completed: subtasks.length > 0
-            ? subtasks.every((subtask) => subtask.completed)
-            : todo.completed,
+          subtasks: updatedSubtasks,
+          completed,
         };
       }),
     );
   }
 
   function addSubtask(todoId, text) {
-    if (!text.trim()) return;
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
 
     const subtask = {
       id: crypto.randomUUID(),
-      text: text.trim(),
+      text: trimmedText,
       completed: false,
     };
-    setTodos((current) =>
-      current.map((todo) =>
-        // Färdiga lappar måste ångras innan fler deluppgifter kan läggas till.
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) =>
+        // En färdig lapp måste ångras innan fler deluppgifter kan läggas till.
         todo.id === todoId && !todo.completed
           ? { ...todo, subtasks: [...todo.subtasks, subtask] }
           : todo,
@@ -83,6 +89,8 @@ function useTodos() {
           ? { ...subtask, completed: !subtask.completed }
           : subtask,
       ),
+      // Kryssrutan kan fortfarande användas för att ångra en avbockning.
+      { allowCompleted: true },
     );
   }
 

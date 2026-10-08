@@ -1,20 +1,24 @@
 import TodoSubtask from "./TodoSubtask";
 
 function TodoChecklist({
-  todo,
+  todoId,
+  todoTitle,
+  subtasks,
+  todoCompleted,
   onToggleSubtask,
   onEditSubtask,
   onDeleteSubtask,
 }) {
-  if (todo.subtasks.length === 0) return null;
+  if (subtasks.length === 0) return null;
 
   return (
-    <ul aria-label={`Deluppgifter för ${todo.text}`} className="min-w-0 flex-[1_1_11rem] space-y-1">
-      {todo.subtasks.map((subtask) => (
+    <ul aria-label={`Deluppgifter för ${todoTitle}`} className="min-w-0 flex-[1_1_11rem] space-y-1">
+      {subtasks.map((subtask) => (
         <TodoSubtask
           key={subtask.id}
-          todoId={todo.id}
+          todoId={todoId}
           subtask={subtask}
+          todoCompleted={todoCompleted}
           onToggleSubtask={onToggleSubtask}
           onEditSubtask={onEditSubtask}
           onDeleteSubtask={onDeleteSubtask}
