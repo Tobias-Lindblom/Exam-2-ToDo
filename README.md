@@ -1,5 +1,9 @@
 # Mina lappar
 
+## Länk till min redovisning:
+
+https://funet-my.sharepoint.com/:v:/g/personal/3ggyhmu26_lindto_folkuniversitetet_nu/IQBWYt72i9R7QKd1BRjkiP5_AYHHUpS0gfeMv-_in5y2EVU?e=9xG4HT
+
 Exam 2 ToDoAppen
 
 ## Frågor om koden
